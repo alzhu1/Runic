@@ -5,11 +5,14 @@ using UnityEngine;
 public class Player : MonoBehaviour {
     [SerializeField] private float moveSpeed;
     [SerializeField] private float jumpVelocity;
+    [SerializeField] private float gravityScale;
 
     [SerializeField] private Transform groundCheckTransform;
     [SerializeField] private LayerMask groundLayer;
 
     private Rigidbody2D rb;
+
+    private bool canAct;
 
     private float horizontal;
     private bool shouldJump;
@@ -32,15 +35,21 @@ public class Player : MonoBehaviour {
 
     void Start() {
         // Attach events
+        EventBus.instance.OnGameStart += EnablePlayer;
         EventBus.instance.OnRuneCollected += UnlockRune;
     }
 
     void OnDestroy() {
         // Detach events
+        EventBus.instance.OnGameStart -= EnablePlayer;
         EventBus.instance.OnRuneCollected -= UnlockRune;
     }
 
     void Update() {
+        if (!canAct) {
+            return;
+        }
+
         horizontal = Input.GetAxisRaw("Horizontal");
 
         bool leftCheck = !CanMoveLeft && horizontal < 0;
@@ -55,6 +64,15 @@ public class Player : MonoBehaviour {
     }
 
     void FixedUpdate() {
+        if (!canAct) {
+            rb.gravityScale = 0;
+            return;
+        }
+
+        if (rb.gravityScale < gravityScale) {
+            rb.gravityScale = gravityScale;
+        }
+
         Vector2 currVelocity = rb.velocity;
         currVelocity.x = horizontal * moveSpeed * Time.fixedDeltaTime;
 
@@ -66,6 +84,10 @@ public class Player : MonoBehaviour {
         }
 
         rb.velocity = currVelocity;
+    }
+
+    public void EnablePlayer() {
+        canAct = true;
     }
 
     public void UnlockRune(Rune r) {
