@@ -19,7 +19,9 @@ public class Player : MonoBehaviour {
     [SerializeField] private Transform groundCheckTransform;
     [SerializeField] private LayerMask groundLayer;
 
+    private Animator animator;
     private Rigidbody2D rb;
+    private SpriteRenderer sr;
 
     private bool canAct;
 
@@ -48,7 +50,9 @@ public class Player : MonoBehaviour {
     private bool CanSuperJump { get { return abilityChecks[6]; }}
 
     void Awake() {
+        animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
+        sr = GetComponent<SpriteRenderer>();
         abilityChecks = new bool[7];
     }
 
@@ -69,6 +73,12 @@ public class Player : MonoBehaviour {
             return;
         }
 
+        Debug.Log(grounded);
+
+        animator.SetFloat("xSpeed", Mathf.Abs(rb.velocity.x));
+        animator.SetBool("Grounded", grounded);
+        animator.SetBool("Dashing", dashing);
+
         horizontal = Input.GetAxisRaw("Horizontal");
         vertical = Input.GetAxisRaw("Vertical");
 
@@ -83,6 +93,7 @@ public class Player : MonoBehaviour {
         } else if (horizontal > 0) {
             facingLeft = false;
         }
+        sr.flipX = facingLeft;
 
         // TODO: Replace GetKeyDown with GetButtonDown
         // Also finalize super jump key
