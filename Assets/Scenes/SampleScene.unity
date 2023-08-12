@@ -157,7 +157,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 200
   jumpVelocity: 7
+  superJumpVelocity: 15
   gravityScale: 1.25
+  dashVelocity: 16
+  dashDrag: 2.5
+  dashTime: 0.4
+  changeSizeTime: 0.25
+  glideDescendVelocity: -0.8
   groundCheckTransform: {fileID: 2038048667}
   groundLayer:
     serializedVersion: 2
@@ -239,7 +245,7 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1.25
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 740b9f2389a4d4c578542fa94c398d36, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -249,7 +255,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!212 &27987395
 SpriteRenderer:
   m_ObjectHideFlags: 0

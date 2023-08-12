@@ -39,6 +39,10 @@ public class UIManager : MonoBehaviour {
             t += Time.deltaTime;
         }
 
+        foreach (Text text in introText) {
+            text.color = endColor;
+        }
+
         intro.SetActive(false);
     }
 }

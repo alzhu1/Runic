@@ -5,7 +5,16 @@ using UnityEngine;
 public class Player : MonoBehaviour {
     [SerializeField] private float moveSpeed;
     [SerializeField] private float jumpVelocity;
+    [SerializeField] private float superJumpVelocity;
     [SerializeField] private float gravityScale;
+
+    [SerializeField] private float dashVelocity;
+    [SerializeField] private float dashDrag;
+    [SerializeField] private float dashTime;
+
+    [SerializeField] private float changeSizeTime;
+
+    [SerializeField] private float glideDescendVelocity;
 
     [SerializeField] private Transform groundCheckTransform;
     [SerializeField] private LayerMask groundLayer;
@@ -15,8 +24,18 @@ public class Player : MonoBehaviour {
     private bool canAct;
 
     private float horizontal;
-    private bool shouldJump;
+    private float vertical;
+    private bool facingLeft;
+
     private bool grounded;
+
+    private bool shouldJump;
+    private bool shouldSuperJump;
+
+    private bool dashing;
+    private bool shrunk;
+    private bool changingSize;
+    private bool gliding;
 
     // Rune unlocks and properties
     private bool[] abilityChecks;
@@ -51,6 +70,7 @@ public class Player : MonoBehaviour {
         }
 
         horizontal = Input.GetAxisRaw("Horizontal");
+        vertical = Input.GetAxisRaw("Vertical");
 
         bool leftCheck = !CanMoveLeft && horizontal < 0;
         bool rightCheck = !CanMoveRight && horizontal > 0;
@@ -58,14 +78,50 @@ public class Player : MonoBehaviour {
             horizontal = 0;
         }
 
-        if (grounded && !shouldJump && Input.GetButtonDown("Jump")) {
-            shouldJump = true;
+        if (horizontal < 0) {
+            facingLeft = true;
+        } else if (horizontal > 0) {
+            facingLeft = false;
         }
+
+        // TODO: Replace GetKeyDown with GetButtonDown
+        // Also finalize super jump key
+
+        if (grounded && !shouldJump && !shouldSuperJump) {
+            if (Input.GetButtonDown("Jump")) {
+                shouldJump = true;
+            }
+
+            if (Input.GetKeyDown(KeyCode.X)) {
+                // TODO: Not sure if this should charge up?
+                shouldSuperJump = true;
+            }
+        }
+
+        if (!dashing && Input.GetKeyDown(KeyCode.Z)) {
+            StartCoroutine(Dash());
+        }
+
+        if (!changingSize) {
+            if (vertical < 0 && !shrunk) {
+                StartCoroutine(ChangeSize(true));
+            }
+
+            if (vertical > 0 && shrunk) {
+                StartCoroutine(ChangeSize(false));
+            }
+        }
+
+        gliding = Input.GetKey(KeyCode.LeftShift);
     }
 
     void FixedUpdate() {
         if (!canAct) {
             rb.gravityScale = 0;
+            return;
+        }
+
+        if (dashing) {
             return;
         }
 
@@ -78,12 +134,61 @@ public class Player : MonoBehaviour {
 
         grounded = Physics2D.OverlapCircle(groundCheckTransform.position, 0.05f, groundLayer);
 
-        if (grounded &&shouldJump) {
-            currVelocity.y = jumpVelocity;
-            shouldJump = false;
+        if (grounded) {
+            // Actions for grounded (jump, super jump)
+            if (shouldJump) {
+                currVelocity.y = jumpVelocity;
+                shouldJump = false;
+            }
+
+            if (shouldSuperJump) {
+                currVelocity.y = superJumpVelocity;
+                shouldSuperJump = false;
+            }
+        } else {
+            // Actions for ungrounded (glide)
+            if (gliding) {
+                currVelocity.y = Mathf.Max(currVelocity.y, glideDescendVelocity);
+            }
         }
 
         rb.velocity = currVelocity;
+    }
+
+    IEnumerator Dash() {
+        dashing = true;
+        rb.drag = dashDrag;
+        rb.gravityScale = 0;
+
+        float factor = facingLeft ? -1 : 1;
+        rb.velocity = new Vector2(dashVelocity * factor, 0);
+        yield return new WaitForSeconds(dashTime);
+
+        dashing = false;
+        rb.drag = 0f;
+        rb.gravityScale = gravityScale;
+    }
+
+    IEnumerator ChangeSize(bool shouldShrink) {
+        changingSize = true;
+
+        Vector3 startScale = transform.localScale;
+        Vector3 endScale = Vector3.one;
+        if (shouldShrink) {
+            endScale.x = 0.5f;
+            endScale.y = 0.5f;
+        }
+
+        float t = 0;
+        while (t < changeSizeTime) {
+            transform.localScale = Vector3.Lerp(startScale, endScale, t / changeSizeTime);
+            yield return null;
+            t += Time.deltaTime;
+        }
+        transform.localScale = endScale;
+
+        shrunk = shouldShrink;
+        changingSize = false;
     }
 
     public void EnablePlayer() {
