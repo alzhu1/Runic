@@ -9,10 +9,14 @@ public class UIManager : MonoBehaviour {
     [SerializeField] private Image transitionImage;
     [SerializeField] private float fadeTime;
     [SerializeField] private float fadeWaitTime;
-    [SerializeField] private Text timerText;
+    [SerializeField] private GameObject timerUI;
 
     // TODO: Should also handle panel to show available buttons
-    private Coroutine timerCoroutine;
+    private Text timerText;
+
+    void Awake() {
+        timerText = timerUI.GetComponentInChildren<Text>();
+    }
 
     void Start() {
         EventBus.instance.OnGameStart += HideIntroText;
@@ -41,11 +45,9 @@ public class UIManager : MonoBehaviour {
     }
 
     void ReceiveTimerEvent(Timer t, bool timerStarted) {
-        timerText.enabled = timerStarted;
+        timerUI.SetActive(timerStarted);
         if (timerStarted) {
-            timerCoroutine = StartCoroutine(UpdateTimer(t));
-        } else {
-            StopCoroutine(timerCoroutine);
+            StartCoroutine(UpdateTimer(t));
         }
     }
 
@@ -101,16 +103,11 @@ public class UIManager : MonoBehaviour {
     }
 
     IEnumerator UpdateTimer(Timer timer) {
-        Color startColor = Color.white;
-        Color endColor = Color.white;
-        endColor.a = 0;
-
-        timerText.color = startColor;
-        while (timerText.enabled && timer.TimeLeft > 0) {
+        while (timerUI.activeInHierarchy && timer.TimeLeft > 0) {
             timerText.text = String.Format("{0:0.00}", timer.TimeLeft);
             yield return null;
         }
 
-        timerText.enabled = false;
+        timerUI.SetActive(false);
     }
 }
