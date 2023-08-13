@@ -5,23 +5,32 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour {
     [SerializeField] private GameObject intro;
+    [SerializeField] private Image transitionImage;
+    [SerializeField] private float fadeTime;
+    [SerializeField] private float fadeWaitTime;
 
     // TODO: Should also handle panel to show available buttons
 
     void Start() {
-        EventBus.instance.OnGameStart += StartGame;
+        EventBus.instance.OnGameStart += HideIntroText;
+        EventBus.instance.OnDoorEntrance += ShowTransition;
     }
 
     void OnDestroy() {
-        EventBus.instance.OnGameStart -= StartGame;
+        EventBus.instance.OnGameStart -= HideIntroText;
+        EventBus.instance.OnDoorEntrance -= ShowTransition;
     }
 
     void Update() {
         
     }
 
-    void StartGame() {
+    void HideIntroText() {
         StartCoroutine(FadeIntro());
+    }
+
+    void ShowTransition(Door d) {
+        StartCoroutine(FadeTransition());
     }
 
     IEnumerator FadeIntro() {
@@ -44,5 +53,30 @@ public class UIManager : MonoBehaviour {
         }
 
         intro.SetActive(false);
+    }
+
+    IEnumerator FadeTransition() {
+        Color show = Color.clear;
+        Color hide = Color.black;
+
+        // First, fade to black
+        float t = 0;
+        while (t < fadeTime) {
+            transitionImage.color = Color.Lerp(show, hide, t / fadeTime);
+            yield return null;
+            t += Time.deltaTime;
+        }
+        transitionImage.color = hide;
+
+        yield return new WaitForSeconds(fadeWaitTime);
+
+        // Then reveal
+        t = 0;
+        while (t < fadeTime) {
+            transitionImage.color = Color.Lerp(hide, show, t / fadeTime);
+            yield return null;
+            t += Time.deltaTime;
+        }
+        transitionImage.color = show;
     }
 }

@@ -19,6 +19,8 @@ public class Player : MonoBehaviour {
     [SerializeField] private Transform groundCheckTransform;
     [SerializeField] private LayerMask groundLayer;
 
+    [SerializeField] private float transitionTime;
+
     private Animator animator;
     private BoxCollider2D boxCollider;
     private Rigidbody2D rb;
@@ -68,12 +70,14 @@ public class Player : MonoBehaviour {
         // Attach events
         EventBus.instance.OnGameStart += EnablePlayer;
         EventBus.instance.OnRuneCollected += UnlockRune;
+        EventBus.instance.OnDoorEntrance += MovePlayerToRoom;
     }
 
     void OnDestroy() {
         // Detach events
         EventBus.instance.OnGameStart -= EnablePlayer;
         EventBus.instance.OnRuneCollected -= UnlockRune;
+        EventBus.instance.OnDoorEntrance -= MovePlayerToRoom;
     }
 
     void Update() {
@@ -215,11 +219,20 @@ public class Player : MonoBehaviour {
         changingSize = false;
     }
 
-    public void EnablePlayer() {
+    void EnablePlayer() {
         canAct = true;
     }
 
-    public void UnlockRune(Rune r) {
+    void UnlockRune(Rune r) {
         abilityChecks[r.AbilityId] = true;
+    }
+
+    void MovePlayerToRoom(Door d) {
+        StartCoroutine(MovePlayerToLocation(d.GetTargetLocation()));
+    }
+
+    IEnumerator MovePlayerToLocation(Vector3 location) {
+        yield return new WaitForSeconds(transitionTime);
+        transform.position = location;
     }
 }

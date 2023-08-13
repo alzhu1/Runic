@@ -8,6 +8,7 @@ public class EventBus : MonoBehaviour {
 
     public event Action OnGameStart = delegate {};
     public event Action<Rune> OnRuneCollected = delegate {};
+    public event Action<Door> OnDoorEntrance = delegate {};
 
     // TODO: Not sure if this is best place for this
     private bool gameStarted;
@@ -35,5 +36,9 @@ public class EventBus : MonoBehaviour {
 
     public void TriggerOnRuneCollected(Rune r) {
         OnRuneCollected?.Invoke(r);
+    }
+
+    public void TriggerOnDoorEntrance(Door d) {
+        OnDoorEntrance?.Invoke(d);
     }
 }
