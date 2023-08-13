@@ -39,7 +39,7 @@ public class Player : MonoBehaviour {
     private bool shouldJump;
     private bool shouldSuperJump;
 
-    private bool canDash;
+    private bool dashRecharged;
     private bool dashing;
     private bool shrunk;
     private bool changingSize;
@@ -109,8 +109,9 @@ public class Player : MonoBehaviour {
 
         // TODO: Replace GetKeyDown with GetButtonDown
         // Also finalize super jump key
+        // Also, fix this mess of boolean expressions...
 
-        if (grounded && !shouldJump && !shouldSuperJump) {
+        if (CanJump && grounded && !dashing && !shouldJump && !shouldSuperJump) {
             if (Input.GetButtonDown("Jump")) {
                 shouldJump = true;
             }
@@ -121,9 +122,9 @@ public class Player : MonoBehaviour {
             }
         }
 
-        // Allow dash once grounded
-        canDash = canDash || grounded;
-        if (canDash && !dashing && Input.GetKeyDown(KeyCode.Z)) {
+        // Recharge dash once grounded
+        dashRecharged = dashRecharged || grounded;
+        if (CanDash && dashRecharged && !dashing && Input.GetKeyDown(KeyCode.Z)) {
             StartCoroutine(Dash());
         }
 
@@ -182,7 +183,7 @@ public class Player : MonoBehaviour {
 
     IEnumerator Dash() {
         dashing = true;
-        canDash = false;
+        dashRecharged = false;
         rb.drag = dashDrag;
         rb.gravityScale = 0;
 

@@ -26,7 +26,9 @@ public class Timer : MonoBehaviour {
 
         if (timeLeft > 0) {
             timeLeft = Mathf.Max(timeLeft - Time.deltaTime, 0);
-            if (timeLeft == 0) {
+
+            // Only reset position if timer was started
+            if (timeLeft == 0 && timerStarted) {
                 timerStarted = false;
                 EventBus.instance.TriggerOnTimerElapsed(this);
             }
