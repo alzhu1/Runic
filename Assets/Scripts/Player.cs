@@ -70,14 +70,16 @@ public class Player : MonoBehaviour {
         // Attach events
         EventBus.instance.OnGameStart += EnablePlayer;
         EventBus.instance.OnRuneCollected += UnlockRune;
-        EventBus.instance.OnDoorEntrance += MovePlayerToRoom;
+        EventBus.instance.OnDoorEntrance += ReceiveDoorEvent;
+        EventBus.instance.OnTimerElapsed += ReceiveTimerElapsedEvent;
     }
 
     void OnDestroy() {
         // Detach events
         EventBus.instance.OnGameStart -= EnablePlayer;
         EventBus.instance.OnRuneCollected -= UnlockRune;
-        EventBus.instance.OnDoorEntrance -= MovePlayerToRoom;
+        EventBus.instance.OnDoorEntrance -= ReceiveDoorEvent;
+        EventBus.instance.OnTimerElapsed -= ReceiveTimerElapsedEvent;
     }
 
     void Update() {
@@ -227,8 +229,12 @@ public class Player : MonoBehaviour {
         abilityChecks[r.AbilityId] = true;
     }
 
-    void MovePlayerToRoom(Door d) {
+    void ReceiveDoorEvent(Door d) {
         StartCoroutine(MovePlayerToLocation(d.GetTargetLocation()));
+    }
+
+    void ReceiveTimerElapsedEvent(Timer t) {
+        StartCoroutine(MovePlayerToLocation(t.GetRespawnLocation()));
     }
 
     IEnumerator MovePlayerToLocation(Vector3 location) {

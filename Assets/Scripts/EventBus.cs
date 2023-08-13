@@ -9,6 +9,8 @@ public class EventBus : MonoBehaviour {
     public event Action OnGameStart = delegate {};
     public event Action<Rune> OnRuneCollected = delegate {};
     public event Action<Door> OnDoorEntrance = delegate {};
+    public event Action<Timer, bool> OnTimerStateChange = delegate {};
+    public event Action<Timer> OnTimerElapsed = delegate {};
 
     // TODO: Not sure if this is best place for this
     private bool gameStarted;
@@ -40,5 +42,13 @@ public class EventBus : MonoBehaviour {
 
     public void TriggerOnDoorEntrance(Door d) {
         OnDoorEntrance?.Invoke(d);
+    }
+
+    public void TriggerOnTimerStateChange(Timer t, bool timerStarted) {
+        OnTimerStateChange?.Invoke(t, timerStarted);
+    }
+
+    public void TriggerOnTimerElapsed(Timer t) {
+        OnTimerElapsed?.Invoke(t);
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,17 +9,23 @@ public class UIManager : MonoBehaviour {
     [SerializeField] private Image transitionImage;
     [SerializeField] private float fadeTime;
     [SerializeField] private float fadeWaitTime;
+    [SerializeField] private Text timerText;
 
     // TODO: Should also handle panel to show available buttons
+    private Coroutine timerCoroutine;
 
     void Start() {
         EventBus.instance.OnGameStart += HideIntroText;
-        EventBus.instance.OnDoorEntrance += ShowTransition;
+        EventBus.instance.OnDoorEntrance += ReceiveDoorEvent;
+        EventBus.instance.OnTimerStateChange += ReceiveTimerEvent;
+        EventBus.instance.OnTimerElapsed += ReceiveTimerElapsedEvent;
     }
 
     void OnDestroy() {
         EventBus.instance.OnGameStart -= HideIntroText;
-        EventBus.instance.OnDoorEntrance -= ShowTransition;
+        EventBus.instance.OnDoorEntrance -= ReceiveDoorEvent;
+        EventBus.instance.OnTimerStateChange -= ReceiveTimerEvent;
+        EventBus.instance.OnTimerElapsed -= ReceiveTimerElapsedEvent;
     }
 
     void Update() {
@@ -29,7 +36,20 @@ public class UIManager : MonoBehaviour {
         StartCoroutine(FadeIntro());
     }
 
-    void ShowTransition(Door d) {
+    void ReceiveDoorEvent(Door d) {
+        StartCoroutine(FadeTransition());
+    }
+
+    void ReceiveTimerEvent(Timer t, bool timerStarted) {
+        timerText.enabled = timerStarted;
+        if (timerStarted) {
+            timerCoroutine = StartCoroutine(UpdateTimer(t));
+        } else {
+            StopCoroutine(timerCoroutine);
+        }
+    }
+
+    void ReceiveTimerElapsedEvent(Timer t) {
         StartCoroutine(FadeTransition());
     }
 
@@ -78,5 +98,19 @@ public class UIManager : MonoBehaviour {
             t += Time.deltaTime;
         }
         transitionImage.color = show;
+    }
+
+    IEnumerator UpdateTimer(Timer timer) {
+        Color startColor = Color.white;
+        Color endColor = Color.white;
+        endColor.a = 0;
+
+        timerText.color = startColor;
+        while (timerText.enabled && timer.TimeLeft > 0) {
+            timerText.text = String.Format("{0:0.00}", timer.TimeLeft);
+            yield return null;
+        }
+
+        timerText.enabled = false;
     }
 }
