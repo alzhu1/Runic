@@ -20,10 +20,13 @@ public class Player : MonoBehaviour {
     [SerializeField] private LayerMask groundLayer;
 
     private Animator animator;
+    private BoxCollider2D boxCollider;
     private Rigidbody2D rb;
     private SpriteRenderer sr;
 
     private bool canAct;
+
+    private float normalScale;
 
     private float horizontal;
     private float vertical;
@@ -34,6 +37,7 @@ public class Player : MonoBehaviour {
     private bool shouldJump;
     private bool shouldSuperJump;
 
+    private bool canDash;
     private bool dashing;
     private bool shrunk;
     private bool changingSize;
@@ -51,8 +55,12 @@ public class Player : MonoBehaviour {
 
     void Awake() {
         animator = GetComponent<Animator>();
+        boxCollider = GetComponent<BoxCollider2D>();
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
+
+        normalScale = transform.localScale.x;
+
         abilityChecks = new bool[7];
     }
 
@@ -72,8 +80,6 @@ public class Player : MonoBehaviour {
         if (!canAct) {
             return;
         }
-
-        Debug.Log(grounded);
 
         animator.SetFloat("xSpeed", Mathf.Abs(rb.velocity.x));
         animator.SetBool("Grounded", grounded);
@@ -109,7 +115,9 @@ public class Player : MonoBehaviour {
             }
         }
 
-        if (!dashing && Input.GetKeyDown(KeyCode.Z)) {
+        // Allow dash once grounded
+        canDash = canDash || grounded;
+        if (canDash && !dashing && Input.GetKeyDown(KeyCode.Z)) {
             StartCoroutine(Dash());
         }
 
@@ -168,6 +176,7 @@ public class Player : MonoBehaviour {
 
     IEnumerator Dash() {
         dashing = true;
+        canDash = false;
         rb.drag = dashDrag;
         rb.gravityScale = 0;
 
@@ -184,19 +193,23 @@ public class Player : MonoBehaviour {
         changingSize = true;
 
         Vector3 startScale = transform.localScale;
-        Vector3 endScale = Vector3.one;
+        Vector3 endScale = new Vector3(normalScale, normalScale, 1);
         if (shouldShrink) {
-            endScale.x = 0.5f;
-            endScale.y = 0.5f;
+            endScale.x *= 0.5f;
+            endScale.y *= 0.5f;
         }
+        float currEdgeRadius = boxCollider.edgeRadius;
+        float targetEdgeRadius = shouldShrink ? currEdgeRadius / 2 : currEdgeRadius * 2;
 
         float t = 0;
         while (t < changeSizeTime) {
             transform.localScale = Vector3.Lerp(startScale, endScale, t / changeSizeTime);
+            boxCollider.edgeRadius = Mathf.Lerp(currEdgeRadius, targetEdgeRadius, t / changeSizeTime);
             yield return null;
             t += Time.deltaTime;
         }
         transform.localScale = endScale;
+        boxCollider.edgeRadius = targetEdgeRadius;
 
         shrunk = shouldShrink;
         changingSize = false;
