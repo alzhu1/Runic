@@ -7,6 +7,7 @@ public class EventBus : MonoBehaviour {
     public static EventBus instance = null;
 
     public event Action OnGameStart = delegate {};
+    public event Action<int, bool> OnPlayerAction = delegate {};
     public event Action<Rune> OnRuneCollected = delegate {};
     public event Action<Door> OnDoorEntrance = delegate {};
     public event Action<Timer, bool> OnTimerStateChange = delegate {};
@@ -34,6 +35,10 @@ public class EventBus : MonoBehaviour {
 
     public void TriggerOnGameStart() {
         OnGameStart?.Invoke();
+    }
+
+    public void TriggerOnPlayerAction(int abilityId, bool state) {
+        OnPlayerAction?.Invoke(abilityId, state);
     }
 
     public void TriggerOnRuneCollected(Rune r) {

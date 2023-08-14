@@ -3,6 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MonoBehaviour {
+    public const int MOVE_LEFT_ID = 0;
+    public const int MOVE_RIGHT_ID = 1;
+    public const int JUMP_ID = 2;
+    public const int DASH_ID = 3;
+    public const int CHANGE_SIZE_ID = 4;
+    public const int SUPER_JUMP_ID = 5;
+
     [SerializeField] private float moveSpeed;
     [SerializeField] private float jumpVelocity;
     [SerializeField] private float superJumpVelocity;
@@ -13,8 +20,6 @@ public class Player : MonoBehaviour {
     [SerializeField] private float dashTime;
 
     [SerializeField] private float changeSizeTime;
-
-    [SerializeField] private float glideDescendVelocity;
 
     [SerializeField] private Transform groundCheckTransform;
     [SerializeField] private LayerMask groundLayer;
@@ -46,17 +51,16 @@ public class Player : MonoBehaviour {
     private bool dashing;
     private bool shrunk;
     private bool changingSize;
-    private bool gliding;
 
     // Rune unlocks and properties
     private bool[] abilityChecks;
-    private bool CanMoveLeft { get { return abilityChecks[0]; }}
-    private bool CanMoveRight { get { return abilityChecks[1]; }}
-    private bool CanJump { get { return abilityChecks[2]; }}
-    private bool CanDash { get { return abilityChecks[3]; }}
-    private bool CanChangeSize { get { return abilityChecks[4]; }}
-    private bool CanGlide { get { return abilityChecks[5]; }}
-    private bool CanSuperJump { get { return abilityChecks[6]; }}
+
+    private bool CanMoveLeft { get { return abilityChecks[MOVE_LEFT_ID]; }}
+    private bool CanMoveRight { get { return abilityChecks[MOVE_RIGHT_ID]; }}
+    private bool CanJump { get { return abilityChecks[JUMP_ID]; }}
+    private bool CanDash { get { return abilityChecks[DASH_ID]; }}
+    private bool CanChangeSize { get { return abilityChecks[CHANGE_SIZE_ID]; }}
+    private bool CanSuperJump { get { return abilityChecks[SUPER_JUMP_ID]; }}
 
     void Awake() {
         animator = GetComponent<Animator>();
@@ -66,7 +70,7 @@ public class Player : MonoBehaviour {
 
         normalScale = transform.localScale.x;
 
-        abilityChecks = new bool[7];
+        abilityChecks = new bool[6];
         if (debugMode) {
             for (int i = 0; i < abilityChecks.Length; i++) {
                 abilityChecks[i] = true;
@@ -145,8 +149,6 @@ public class Player : MonoBehaviour {
                 StartCoroutine(ChangeSize(false));
             }
         }
-
-        gliding = Input.GetKey(KeyCode.LeftShift);
     }
 
     void FixedUpdate() {
@@ -168,21 +170,19 @@ public class Player : MonoBehaviour {
 
         grounded = Physics2D.OverlapCircle(groundCheckTransform.position, 0.05f, groundLayer);
 
+        // Handle Jump
         if (grounded) {
             // Actions for grounded (jump, super jump)
             if (shouldJump) {
                 currVelocity.y = jumpVelocity;
                 shouldJump = false;
+                TriggerActionEvent(JUMP_ID, true);
             }
 
             if (shouldSuperJump) {
                 currVelocity.y = superJumpVelocity;
                 shouldSuperJump = false;
-            }
-        } else {
-            // Actions for ungrounded (glide)
-            if (gliding) {
-                currVelocity.y = Mathf.Max(currVelocity.y, glideDescendVelocity);
+                TriggerActionEvent(SUPER_JUMP_ID, true);
             }
         }
 
@@ -194,6 +194,8 @@ public class Player : MonoBehaviour {
         dashRecharged = false;
         rb.drag = dashDrag;
         rb.gravityScale = 0;
+
+        TriggerActionEvent(DASH_ID, true);
 
         float factor = facingLeft ? -1 : 1;
         rb.velocity = new Vector2(dashVelocity * factor, 0);
@@ -215,6 +217,8 @@ public class Player : MonoBehaviour {
         }
         float currEdgeRadius = boxCollider.edgeRadius;
         float targetEdgeRadius = shouldShrink ? currEdgeRadius / 2 : currEdgeRadius * 2;
+
+        TriggerActionEvent(CHANGE_SIZE_ID, shouldShrink);
 
         float t = 0;
         while (t < changeSizeTime) {
@@ -249,5 +253,9 @@ public class Player : MonoBehaviour {
     IEnumerator MovePlayerToLocation(Vector3 location) {
         yield return new WaitForSeconds(transitionTime);
         transform.position = location;
+    }
+
+    void TriggerActionEvent(int abilityId, bool state) {
+        EventBus.instance.TriggerOnPlayerAction(abilityId, state);
     }
 }

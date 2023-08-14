@@ -52,12 +52,14 @@ public class AudioSystem : MonoBehaviour {
 
     void Start() {
         // Attach events
-        EventBus.instance.OnRuneCollected += OnRuneCollectedAudio;
+        EventBus.instance.OnPlayerAction += ReceivePlayerActionEvent;
+        EventBus.instance.OnRuneCollected += ReceiveRuneCollectedEvent;
     }
 
     void OnDestroy() {
         // Detach events
-        EventBus.instance.OnRuneCollected -= OnRuneCollectedAudio;
+        EventBus.instance.OnPlayerAction -= ReceivePlayerActionEvent;
+        EventBus.instance.OnRuneCollected -= ReceiveRuneCollectedEvent;
     }
 
     Sound Play(string name) {
@@ -70,7 +72,31 @@ public class AudioSystem : MonoBehaviour {
         return s;
     }
 
-    void OnRuneCollectedAudio(Rune r) {
+    void ReceivePlayerActionEvent(int abilityId, bool state) {
+        switch (abilityId) {
+            case Player.JUMP_ID: {
+                Play("Jump");
+                break;
+            }
+
+            case Player.DASH_ID: {
+                Play("Dash");
+                break;
+            }
+
+            case Player.CHANGE_SIZE_ID: {
+                Play(state ? "Shrink" : "Grow");
+                break;
+            }
+
+            case Player.SUPER_JUMP_ID: {
+                Play("SuperJump");
+                break;
+            }
+        }
+    }
+
+    void ReceiveRuneCollectedEvent(Rune r) {
         Play("RuneCollected");
     }
 }
