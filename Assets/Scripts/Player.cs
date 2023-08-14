@@ -21,6 +21,9 @@ public class Player : MonoBehaviour {
 
     [SerializeField] private float transitionTime;
 
+    // TODO: REMOVE
+    [SerializeField] private bool debugMode;
+
     private Animator animator;
     private BoxCollider2D boxCollider;
     private Rigidbody2D rb;
@@ -64,6 +67,11 @@ public class Player : MonoBehaviour {
         normalScale = transform.localScale.x;
 
         abilityChecks = new bool[7];
+        if (debugMode) {
+            for (int i = 0; i < abilityChecks.Length; i++) {
+                abilityChecks[i] = true;
+            }
+        }
     }
 
     void Start() {
@@ -128,7 +136,7 @@ public class Player : MonoBehaviour {
             StartCoroutine(Dash());
         }
 
-        if (!changingSize) {
+        if (!changingSize && CanChangeSize) {
             if (vertical < 0 && !shrunk) {
                 StartCoroutine(ChangeSize(true));
             }
