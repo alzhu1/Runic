@@ -88,11 +88,6 @@ public class AudioSystem : MonoBehaviour {
                 Play(state ? "Shrink" : "Grow");
                 break;
             }
-
-            case Player.SUPER_JUMP_ID: {
-                Play("SuperJump");
-                break;
-            }
         }
     }
 

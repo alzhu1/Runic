@@ -8,11 +8,9 @@ public class Player : MonoBehaviour {
     public const int JUMP_ID = 2;
     public const int DASH_ID = 3;
     public const int CHANGE_SIZE_ID = 4;
-    public const int SUPER_JUMP_ID = 5;
 
     [SerializeField] private float moveSpeed;
     [SerializeField] private float jumpVelocity;
-    [SerializeField] private float superJumpVelocity;
     [SerializeField] private float gravityScale;
 
     [SerializeField] private float dashVelocity;
@@ -45,7 +43,6 @@ public class Player : MonoBehaviour {
     private bool grounded;
 
     private bool shouldJump;
-    private bool shouldSuperJump;
 
     private bool dashRecharged;
     private bool dashing;
@@ -60,7 +57,6 @@ public class Player : MonoBehaviour {
     private bool CanJump { get { return abilityChecks[JUMP_ID]; }}
     private bool CanDash { get { return abilityChecks[DASH_ID]; }}
     private bool CanChangeSize { get { return abilityChecks[CHANGE_SIZE_ID]; }}
-    private bool CanSuperJump { get { return abilityChecks[SUPER_JUMP_ID]; }}
 
     void Awake() {
         animator = GetComponent<Animator>();
@@ -123,14 +119,9 @@ public class Player : MonoBehaviour {
         // Also finalize super jump key
         // Also, fix this mess of boolean expressions...
 
-        if (CanJump && grounded && !dashing && !shouldJump && !shouldSuperJump) {
+        if (CanJump && grounded && !dashing && !shouldJump) {
             if (Input.GetButtonDown("Jump")) {
                 shouldJump = true;
-            }
-
-            if (Input.GetKeyDown(KeyCode.X)) {
-                // TODO: Not sure if this should charge up?
-                shouldSuperJump = true;
             }
         }
 
@@ -177,12 +168,6 @@ public class Player : MonoBehaviour {
                 currVelocity.y = jumpVelocity;
                 shouldJump = false;
                 TriggerActionEvent(JUMP_ID, true);
-            }
-
-            if (shouldSuperJump) {
-                currVelocity.y = superJumpVelocity;
-                shouldSuperJump = false;
-                TriggerActionEvent(SUPER_JUMP_ID, true);
             }
         }
 
