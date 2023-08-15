@@ -115,19 +115,16 @@ public class Player : MonoBehaviour {
         }
         sr.flipX = facingLeft;
 
-        // TODO: Replace GetKeyDown with GetButtonDown
-        // Also finalize super jump key
-        // Also, fix this mess of boolean expressions...
+        // TODO: fix this mess of boolean expressions...
 
-        if (CanJump && grounded && !dashing && !shouldJump) {
-            if (Input.GetButtonDown("Jump")) {
-                shouldJump = true;
-            }
+        if (CanJump && grounded && !dashing && !shouldJump && Input.GetButtonDown("Jump")) {
+            shouldJump = true;
+
         }
 
         // Recharge dash once grounded
         dashRecharged = dashRecharged || grounded;
-        if (CanDash && dashRecharged && !dashing && Input.GetKeyDown(KeyCode.Z)) {
+        if (CanDash && dashRecharged && !dashing && Input.GetButtonDown("Dash")) {
             StartCoroutine(Dash());
         }
 
