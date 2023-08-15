@@ -10,16 +10,19 @@ public class UIManager : MonoBehaviour {
     [SerializeField] private float fadeTime;
     [SerializeField] private float fadeWaitTime;
     [SerializeField] private GameObject timerUI;
+    [SerializeField] private RawImage panelUI;
 
-    // TODO: Should also handle panel to show available buttons
     private Text timerText;
+    private Image[] panelImages;
 
     void Awake() {
         timerText = timerUI.GetComponentInChildren<Text>();
+        panelImages = panelUI.GetComponentsInChildren<Image>();
     }
 
     void Start() {
         EventBus.instance.OnGameStart += HideIntroText;
+        EventBus.instance.OnRuneCollected += ReceiveRuneCollectedEvent;
         EventBus.instance.OnDoorEntrance += ReceiveDoorEvent;
         EventBus.instance.OnTimerStateChange += ReceiveTimerEvent;
         EventBus.instance.OnTimerElapsed += ReceiveTimerElapsedEvent;
@@ -27,6 +30,7 @@ public class UIManager : MonoBehaviour {
 
     void OnDestroy() {
         EventBus.instance.OnGameStart -= HideIntroText;
+        EventBus.instance.OnRuneCollected -= ReceiveRuneCollectedEvent;
         EventBus.instance.OnDoorEntrance -= ReceiveDoorEvent;
         EventBus.instance.OnTimerStateChange -= ReceiveTimerEvent;
         EventBus.instance.OnTimerElapsed -= ReceiveTimerElapsedEvent;
@@ -38,6 +42,10 @@ public class UIManager : MonoBehaviour {
 
     void HideIntroText() {
         StartCoroutine(FadeIntro());
+    }
+
+    void ReceiveRuneCollectedEvent(Rune r) {
+        StartCoroutine(ShowRune(r.AbilityId));
     }
 
     void ReceiveDoorEvent(Door d) {
@@ -57,24 +65,59 @@ public class UIManager : MonoBehaviour {
 
     IEnumerator FadeIntro() {
         Text[] introText = intro.GetComponentsInChildren<Text>();
-        Color startColor = Color.white;
-        Color endColor = Color.white;
-        endColor.a = 0;
+        Text panelText = panelUI.GetComponentInChildren<Text>();
+
+        Color white = Color.white;
+        Color clearWhite = Color.white;
+        clearWhite.a = 0;
+
+        Color panelColor = panelUI.color;
+        Color endPanelColor = panelUI.color;
+        endPanelColor.a = 0.9f;
 
         float t = 0;
         while (t < 1) {
+            // Fade out text
             foreach (Text text in introText) {
-                text.color = Color.Lerp(startColor, endColor, t);
+                text.color = Color.Lerp(white, clearWhite, t);
             }
+
+            // Fade in panel
+            panelUI.color = Color.Lerp(panelColor, endPanelColor, t);
+            panelText.color = Color.Lerp(clearWhite, white, t);
             yield return null;
             t += Time.deltaTime;
         }
 
+        // Clear out intro
         foreach (Text text in introText) {
-            text.color = endColor;
+            text.color = clearWhite;
         }
 
+        // Focus panel
+        panelUI.color = endPanelColor;
+        panelText.color = white;
+
         intro.SetActive(false);
+    }
+
+    IEnumerator ShowRune(int abilityId) {
+        Image runeImage = panelImages[abilityId];
+        Image otherImage = abilityId == Player.CHANGE_SIZE_ID ? panelImages[abilityId + 1] : null;
+        Color startColor = runeImage.color;
+        Color endColor = runeImage.color;
+        endColor.a = 1;
+
+        float t = 0;
+        while (t < 1) {
+            runeImage.color = Color.Lerp(startColor, endColor, t);
+            if (otherImage != null) {
+                otherImage.color = Color.Lerp(startColor, endColor, t);
+            }
+            yield return null;
+            t += Time.deltaTime;
+        }
+        runeImage.color = endColor;
     }
 
     IEnumerator FadeTransition() {

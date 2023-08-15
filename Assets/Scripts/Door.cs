@@ -5,8 +5,8 @@ using UnityEngine;
 public class Door : MonoBehaviour {
     [SerializeField] private Sprite openSprite;
     [SerializeField] private Sprite closedSprite;
-
     [SerializeField] private Transform targetLocation;
+    [SerializeField] private bool isCloseable;
 
     private SpriteRenderer sr;
     private bool open;
@@ -21,7 +21,9 @@ public class Door : MonoBehaviour {
         if (open && collider.gameObject.layer == 6) {
             EventBus.instance.TriggerOnDoorEntrance(this);
             open = false;
-            StartCoroutine(CloseDoor());
+            if (isCloseable) {
+                StartCoroutine(CloseDoor());
+            }
         }
     }
 

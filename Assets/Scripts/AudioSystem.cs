@@ -54,12 +54,18 @@ public class AudioSystem : MonoBehaviour {
         // Attach events
         EventBus.instance.OnPlayerAction += ReceivePlayerActionEvent;
         EventBus.instance.OnRuneCollected += ReceiveRuneCollectedEvent;
+        EventBus.instance.OnDoorEntrance += ReceiveDoorEvent;
+        EventBus.instance.OnTimerStateChange += ReceiveTimerEvent;
+        EventBus.instance.OnTimerElapsed += ReceiveTimerElapsedEvent;
     }
 
     void OnDestroy() {
         // Detach events
         EventBus.instance.OnPlayerAction -= ReceivePlayerActionEvent;
         EventBus.instance.OnRuneCollected -= ReceiveRuneCollectedEvent;
+        EventBus.instance.OnDoorEntrance -= ReceiveDoorEvent;
+        EventBus.instance.OnTimerStateChange -= ReceiveTimerEvent;
+        EventBus.instance.OnTimerElapsed -= ReceiveTimerElapsedEvent;
     }
 
     Sound Play(string name) {
@@ -89,6 +95,18 @@ public class AudioSystem : MonoBehaviour {
                 break;
             }
         }
+    }
+
+    void ReceiveDoorEvent(Door d) {
+        Play("DoorEntrance");
+    }
+
+    void ReceiveTimerEvent(Timer t, bool timerStarted) {
+        Play(timerStarted ? "TimerStart" : "TimerBeaten");
+    }
+
+    void ReceiveTimerElapsedEvent(Timer t) {
+        Play("TimerFail");
     }
 
     void ReceiveRuneCollectedEvent(Rune r) {
