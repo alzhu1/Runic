@@ -1039,11 +1039,29 @@ MonoBehaviour:
     loop: 1
     pitch: 1
     source: {fileID: 0}
-  - name: TEST
-    clip: {fileID: 0}
-    volume: 1
+  - name: Shrink
+    clip: {fileID: 8300000, guid: 48c3dbe7312fb4a87839cf8aff8618be, type: 3}
+    volume: 0.45
     loop: 0
-    pitch: 1
+    pitch: 0.7
+    source: {fileID: 0}
+  - name: Grow
+    clip: {fileID: 8300000, guid: 48c3dbe7312fb4a87839cf8aff8618be, type: 3}
+    volume: 0.45
+    loop: 0
+    pitch: 1.2
+    source: {fileID: 0}
+  - name: Jump
+    clip: {fileID: 8300000, guid: d5055bbfd69da4631b5a8c5577d2b6b8, type: 3}
+    volume: 0.2
+    loop: 0
+    pitch: 0.8
+    source: {fileID: 0}
+  - name: Dash
+    clip: {fileID: 8300000, guid: 1730bea8c15834d91a79e87b2bd2eb5a, type: 3}
+    volume: 0.15
+    loop: 0
+    pitch: 0.35
     source: {fileID: 0}
 --- !u!4 &489328755
 Transform:
