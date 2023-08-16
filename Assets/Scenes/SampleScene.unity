@@ -137,6 +137,7 @@ GameObject:
   - component: {fileID: 27987393}
   - component: {fileID: 27987391}
   - component: {fileID: 27987396}
+  - component: {fileID: 27987397}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -168,7 +169,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   transitionTime: 0.4
-  debugMode: 0
+  numDashGhosts: 4
+  numSizeGhosts: 1
+  debugMode: 1
 --- !u!4 &27987392
 Transform:
   m_ObjectHideFlags: 0
@@ -330,6 +333,21 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &27987397
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 27987390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b35387f4c35cb45d29664c9feeab7670, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeBetweenGhosts: 0.1
+  fadeTime: 0.6
+  ghostColor: {r: 0, g: 1, b: 1, a: 1}
 --- !u!1001 &56078879
 PrefabInstance:
   m_ObjectHideFlags: 0

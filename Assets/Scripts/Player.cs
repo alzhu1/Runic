@@ -24,6 +24,9 @@ public class Player : MonoBehaviour {
 
     [SerializeField] private float transitionTime;
 
+    [SerializeField] private int numDashGhosts;
+    [SerializeField] private int numSizeGhosts;
+
     // TODO: REMOVE
     [SerializeField] private bool debugMode;
 
@@ -31,6 +34,7 @@ public class Player : MonoBehaviour {
     private BoxCollider2D boxCollider;
     private Rigidbody2D rb;
     private SpriteRenderer sr;
+    private GhostTrail ghostTrail;
 
     private bool canAct;
 
@@ -63,6 +67,7 @@ public class Player : MonoBehaviour {
         boxCollider = GetComponent<BoxCollider2D>();
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
+        ghostTrail = GetComponent<GhostTrail>();
 
         normalScale = transform.localScale.x;
 
@@ -181,6 +186,8 @@ public class Player : MonoBehaviour {
 
         float factor = facingLeft ? -1 : 1;
         rb.velocity = new Vector2(dashVelocity * factor, 0);
+        ghostTrail.DrawGhost(numDashGhosts);
+
         yield return new WaitForSeconds(dashTime);
 
         dashing = false;
@@ -201,6 +208,7 @@ public class Player : MonoBehaviour {
         float targetEdgeRadius = shouldShrink ? currEdgeRadius / 2 : currEdgeRadius * 2;
 
         TriggerActionEvent(CHANGE_SIZE_ID, shouldShrink);
+        ghostTrail.DrawGhost(numSizeGhosts);
 
         float t = 0;
         while (t < changeSizeTime) {
