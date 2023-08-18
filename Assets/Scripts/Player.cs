@@ -27,9 +27,6 @@ public class Player : MonoBehaviour {
     [SerializeField] private int numDashGhosts;
     [SerializeField] private int numSizeGhosts;
 
-    // TODO: REMOVE
-    [SerializeField] private bool debugMode;
-
     private Animator animator;
     private BoxCollider2D boxCollider;
     private Rigidbody2D rb;
@@ -72,11 +69,6 @@ public class Player : MonoBehaviour {
         normalScale = transform.localScale.x;
 
         abilityChecks = new bool[5];
-        if (debugMode) {
-            for (int i = 0; i < abilityChecks.Length; i++) {
-                abilityChecks[i] = true;
-            }
-        }
     }
 
     void Start() {
