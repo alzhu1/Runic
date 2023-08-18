@@ -29,7 +29,15 @@ public class EventBus : MonoBehaviour {
     void Update() {
         if (!gameStarted && Input.anyKeyDown) {
             gameStarted = true;
-            TriggerOnGameStart();
+            for (int i = 0; i < 3; i++) {
+                if (Input.GetMouseButtonDown(i)) {
+                    gameStarted = false;
+                }
+            }
+
+            if (gameStarted) {
+                TriggerOnGameStart();
+            }
         }
     }
 

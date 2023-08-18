@@ -20,8 +20,8 @@ public class Door : MonoBehaviour {
     void OnTriggerEnter2D(Collider2D collider) {
         if (open && collider.gameObject.layer == 6) {
             EventBus.instance.TriggerOnDoorEntrance(this);
-            open = false;
             if (isCloseable) {
+                open = false;
                 StartCoroutine(CloseDoor());
             }
         }

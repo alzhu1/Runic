@@ -1063,6 +1063,36 @@ MonoBehaviour:
     loop: 0
     pitch: 0.35
     source: {fileID: 0}
+  - name: DoorEntrance
+    clip: {fileID: 8300000, guid: 6f8b8f3ae31c44987b2d1130c2f9c516, type: 3}
+    volume: 0.25
+    loop: 0
+    pitch: 0.15
+    source: {fileID: 0}
+  - name: TimerStart
+    clip: {fileID: 8300000, guid: 1c2849d9ad2c945b68e967053bf83857, type: 3}
+    volume: 0.25
+    loop: 0
+    pitch: 1
+    source: {fileID: 0}
+  - name: TimerBeaten
+    clip: {fileID: 8300000, guid: 982e04187c4744144ae1761fe1eced60, type: 3}
+    volume: 0.25
+    loop: 0
+    pitch: 1
+    source: {fileID: 0}
+  - name: RuneCollected
+    clip: {fileID: 8300000, guid: 9175ebf3b9cc9407cbbe4fb855b958f6, type: 3}
+    volume: 0.25
+    loop: 0
+    pitch: 1.2
+    source: {fileID: 0}
+  - name: TimerFail
+    clip: {fileID: 8300000, guid: bf6fab55c07ba49678c840ba5776e2f0, type: 3}
+    volume: 0.25
+    loop: 0
+    pitch: 0.5
+    source: {fileID: 0}
 --- !u!4 &489328755
 Transform:
   m_ObjectHideFlags: 0
